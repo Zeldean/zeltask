@@ -14,10 +14,22 @@ src/zel{app}/
 │   ├── models.py           # Data structures & types
 │   ├── storage.py          # Data persistence layer
 │   └── {app}_manager.py    # Main business logic
-└── commands/               # CLI command modules
+├── commands/               # CLI command modules
+│   ├── __init__.py
+│   ├── {feature}_commands.py
+│   └── ...
+└── ui/                     # User interface layer (optional)
     ├── __init__.py
-    ├── {feature}_commands.py
-    └── ...
+    ├── tui/                # Terminal UI (TUI) components
+    │   ├── __init__.py
+    │   ├── screens.py      # TUI screen definitions
+    │   ├── widgets.py      # Custom TUI widgets
+    │   └── app.py          # Main TUI application
+    └── web/                # Web interface components
+        ├── __init__.py
+        ├── routes.py       # Web routes/endpoints
+        ├── templates/      # HTML templates
+        └── static/         # CSS/JS assets
 ```
 
 ## Layer Responsibilities
@@ -41,6 +53,24 @@ src/zel{app}/
 - **Files**:
   - `{feature}_commands.py` - Feature-specific commands
   - Group related commands (e.g., task operations, blueprint management)
+
+### UI Layer (`ui/`) - Optional
+- **Purpose**: Alternative user interfaces beyond CLI
+- **Responsibilities**:
+  - Terminal User Interface (TUI) for interactive terminal control
+  - Web interface for browser-based access
+  - UI state management and event handling
+  - Calling core business logic (same as CLI)
+- **Dependencies**: Core layer, UI frameworks (Rich/Textual for TUI, Flask/FastAPI for web)
+- **Components**:
+  - **TUI (`ui/tui/`)**: Terminal-based interactive interface
+    - `app.py` - Main TUI application entry point
+    - `screens.py` - Screen layouts and navigation
+    - `widgets.py` - Custom interactive components
+  - **Web (`ui/web/`)**: Browser-based interface
+    - `routes.py` - HTTP endpoints and API routes
+    - `templates/` - HTML template files
+    - `static/` - CSS, JavaScript, and asset files
 
 ### Core Layer (`core/`)
 - **Purpose**: Business logic and data management
@@ -105,9 +135,32 @@ from zelutil.utils.state import resolve_state_dir
 ### New Zel App Checklist
 1. Create standard folder structure
 2. Use zelutil for paths and state management
-3. Implement 3-layer architecture (CLI → Commands → Core)
+3. Implement core 3-layer architecture (CLI → Commands → Core)
 4. Follow JSON storage standard (active/completed/blueprint)
 5. Add to zelutil registry for cross-app integration
+6. (Optional) Implement UI layer for enhanced user experience
+
+### UI Implementation Guidelines
+
+#### TUI Development (Terminal User Interface)
+- Use libraries like Rich, Textual, or urwid for terminal control
+- Implement real-time updates and interactive navigation
+- Maintain responsive design for different terminal sizes
+- Provide keyboard shortcuts and intuitive controls
+- Example entry: `zeltask --tui` or `zeltask tui`
+
+#### Web Interface Development
+- Use lightweight frameworks (Flask, FastAPI) for API endpoints
+- Implement RESTful API that mirrors CLI functionality
+- Provide real-time updates via WebSockets if needed
+- Ensure mobile-responsive design
+- Example entry: `zeltask --web` or `zeltask serve`
+
+#### UI Design Principles
+- **Consistency**: Same data and operations across all interfaces
+- **Separation**: UI layer only handles presentation, core handles logic
+- **Flexibility**: Users can choose CLI, TUI, or web based on preference
+- **Integration**: All interfaces share the same underlying data and business logic
 
 ### Command Design
 - Group related functionality (e.g., `zeltask task create`)
@@ -121,4 +174,18 @@ from zelutil.utils.state import resolve_state_dir
 - Follow active/completed/blueprint pattern
 - Handle file creation and error cases gracefully
 
-This architecture ensures all Zel apps are consistent, maintainable, and can integrate seamlessly for comprehensive productivity tracking.
+## Interface Options
+
+### CLI (Command Line Interface)
+- **Best for**: Automation, scripting, quick operations
+- **Usage**: `zeltask create "Fix bug" --priority high`
+
+### TUI (Terminal User Interface)
+- **Best for**: Interactive terminal sessions, real-time monitoring
+- **Usage**: `zeltask --tui` (full-screen terminal application)
+
+### Web Interface
+- **Best for**: Remote access, team collaboration, visual dashboards
+- **Usage**: `zeltask serve` (starts web server)
+
+This architecture ensures all Zel apps are consistent, maintainable, and can integrate seamlessly for comprehensive productivity tracking across multiple interface paradigms.
